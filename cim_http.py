@@ -32,27 +32,24 @@ as CIM-XML.
 Requires Python 2.7.9+ or Python 3.3+
 '''
 
-import string
-import re
-import os
-import socket
-import getpass
-from stat import S_ISSOCK
-import platform
 import base64
+import getpass
+import os
+import platform
+import re
+import socket
+from stat import S_ISSOCK
 
 import six
-
 from six.moves import http_client as httplib
 from six.moves.urllib import parse as urllib
+
 from . import cim_obj
 
 if six.PY2:
     from M2Crypto import SSL
-    from M2Crypto.Err import SSLError
 else:
     import ssl as SSL
-    from ssl import SSLError
 
 
 class Error(Exception):
@@ -212,52 +209,10 @@ def wbem_request(url, data, creds, headers=[], debug=0, x509=None,
 
         def connect(self):
             "Connect to a host on a given (SSL) port."
-            self.sock = socket.create_connection((self.host, self.port),
-                                                 self.timeout,
-                                                 self.source_address)
-            if self._tunnel_host:
-                self._tunnel()
-            if six.PY2:
-                ctx = SSL.Context('sslv23')
-            else:
-                ctx = SSL.create_default_context()
-            if self.cert_file:
-                ctx.load_cert(self.cert_file, keyfile=self.key_file)
-            if self.ca_certs:
-                if six.PY2:
-                    ctx.set_verify(
-                        SSL.verify_peer | SSL.verify_fail_if_no_peer_cert,
-                        depth=9, callback=verify_callback)
-                else:
-                    ctx.verify_flags |= SSL.VERIFY_CRL_CHECK_CHAIN
-
-                if os.path.isdir(self.ca_certs):
-                    ctx.load_verify_locations(capath=self.ca_certs)
-                else:
-                    ctx.load_verify_locations(cafile=self.ca_certs)
-            try:
-                if six.PY2:
-                    self.sock = SSL.Connection(ctx, self.sock)
-                else:
-                    self.sock = ctx.wrap_socket(self.sock)
-
-                # Below is a body of SSL.Connection.connect() method
-                # except for the first line (socket connection). We want to
-                # preserve tunneling ability.
-                self.sock.addr = (self.host, self.port)
-                self.sock.setup_ssl()
-                self.sock.set_connect_state()
-                ret = self.sock.connect_ssl()
-                if self.ca_certs:
-                    check = getattr(self.sock, 'postConnectionCheck',
-                                    self.sock.clientPostConnectionCheck)
-                    if check is not None:
-                        if not check(self.sock.get_peer_cert(), self.host):
-                            raise Error('SSL error: post connection check ' \
-                                        'failed')
-                return ret
-            except SSLError as arg:
-                raise Error("SSL error: %s" % arg)
+            new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            new_socket.settimeout(self.timeout)
+            self.sock = SSL.wrap_socket(new_socket)
+            return self.sock.connect_ex((self.host, self.port))
 
     class FileHTTPConnection(HTTPBaseConnection, httplib.HTTPConnection):
 
