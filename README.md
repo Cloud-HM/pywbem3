@@ -1,13 +1,26 @@
-python3-pywbem
-==============
+pywbem3
+=======
 
-This is a fork of PyWBEM for Python 2.6+ and Python 3.4+ that aims to remain 100% compatible with PyWBEM as a drop-in replacement.
+This is a fork of python3-pywbem for Python 3.5+ that will, in the future, try to remain 100% compatible with PyWBEM as a drop-in replacement.
 
-There is another WBEM/CIM library I wrote from scratch that should be used if new features and functionality are desired. This new library is the one I am using on a daily basis, mostly for it's simplicity and small code base. You can check it out here: https://github.com/deejross/python3-wbem
+This project started off originally from deejross's https://github.com/deejross/python3-wbem project. We tried to use the library to connect to our CIM server, but couldn't due to a veriety of reasons. We tried both Python 2.7 and Python 3.5. The main reasons were:
+
+1) Python 2.7 version of python3-pywbem has a dependency on M2Crypto, and since we develop on Mac OS X El Capitan, getting it to install properly was difficult. (See: http://stackoverflow.com/questions/33005354/trouble-installing-m2crypto-with-pip-on-el-capitan. We also ran into a bunch of other issues.)
+
+2) Python 3.5 version wouldn't run as well because of SSL and some errors related to `ValueError: check_hostname requires server_hostname`.
+
+**TL;DR:** it was just too difficult. Let's start over!
+
+So we made a few decisions. They were:
+-------
+* It's year 2016, we should **only** use Python 3
+* Cleaning up all code related to 2.7
+* Use idiomatic Python 3 SSL code
 
 License
 -------
 LGPL 2.1 (original PyWBEM license)
+
 
 Motivation
 ----------
@@ -17,18 +30,13 @@ This fork introduces Python 3.4+ support by dropping M2Crypto in favor of Python
 
 Dependencies
 ------------
-With Python 2.6+:
-* six
-* M2Crypto
-
-With Python 3.4+:
+With Python 3.5+:
  * six
  
-For Python 3.4+, the entire PyWBEM stack is pure-Python!
 
 Installation
 ------------
-There is no PyPI package or anything yet. I've never created one before, but if you'd like one, feel free to contribute! For now, make a `pywbem` folder in your site-packages folder and put the contents of this repo inside it.
+There is no PyPI package. For now, make a `pywbem` folder in your site-packages folder and put the contents of this repo inside it.
 
 Documentation
 -------------
@@ -64,41 +72,3 @@ for n in names:
     for key, value in os.items():
         print '%s = %s' % (key, value)
 ```
-
-Frequently Asked Questions
---------------------------
-Q: Why fork PyWBEM?
-
-A: See the Motivation section.
-
-
-Q: Why do I still need M2Crypto for Python 2.6+?
-
-A: Unfortunately, the `ssl` module in Python 2.6+ doesn't have the SSL certificate options and checks it should have. Recently, Python 2.7.9 was released with some backported `ssl` code that brings it up to parity (nearly) with Python 3.4. However, since M2Crypto is available for the 2.x series in general, it didn't make much sense to port that specific release to using the built-in `ssl` module.
-
-
-Q: Why isn't Python 3.3 (or 3.2) supported?
-
-A: Python's `ssl` module got an update for 3.4 that made it more secure. Specifically, adding the `create_default_context` function which sets some sane defaults depending on the environment.
-
-
-Q: Don't you want to make this library better than the original by adding features that don't exist in the original PyWBEM?
-
-A: Yes and No. I want this library to be a complete drop-in replacement for PyWBEM for those of us on modern platforms. However, I started a new WBEM/CIM library from scratch that is completely separate from PyWBEM. This is where new development is taking place: https://github.com/deejross/python3-wbem
-
-
-Q: How difficult was it to port PyWBEM to Python 3 while maintaining Python 2.6+ compatibility?
-
-A: Short answer: more difficult than I'd hoped. From what I can tell, PyWBEM supports Python 2.3+ (maybe even earlier releases). That meant a lot of the code was calling deprecated methods even by Python 2.6 standards. I'm not going to lie, the conversion of `NocaseDict` was the cause of many problems during testing and I can't tell you how many `has_key` calls needed to be converted to the more modern `in` syntax.
-
-
-Future Enhancements
--------------------
-* If I have time, I will try to keep up with the official PyWBEM repo on SourceForge and make updates when needed
-
-
-Contributions
--------------
-Did you see something in the FAQ or the Future Enhancements sections that you want to help with? Did you find a bug?
-
-Excellent! Feel free to add your contributions through the standard means here on GitHub. I've done some Python 3 conversions for different modules before, but this was by far the most difficult of them so far. I'd love some help improving this module, cleaning up some old code, documentation, tests, or whatever you think could help.
