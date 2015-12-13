@@ -1,6 +1,8 @@
 pywbem3
 =======
 
+WBEM library for Python 3+.
+
 This is a fork of python3-pywbem for Python 3.5+ that will, in the future, try to remain 100% compatible with PyWBEM as a drop-in replacement.
 
 This project started off originally from deejross's https://github.com/deejross/python3-wbem project. We tried to use the library to connect to our CIM server, but couldn't due to a veriety of reasons. We tried both Python 2.7 and Python 3.5. The main reasons were:
