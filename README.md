@@ -16,7 +16,7 @@ This project started off originally from deejross's https://github.com/deejross/
 So we made a few decisions. They were:
 -------
 * It's year 2016, we should **only** use Python 3
-* Cleaning up all code related to 2.7
+* Removing all references/usage of Python 2.7
 * Use idiomatic Python 3 SSL code
 
 License
@@ -38,7 +38,7 @@ With Python 3.5+:
 
 Installation
 ------------
-There is no PyPI package. For now, make a `pywbem` folder in your site-packages folder and put the contents of this repo inside it.
+There is no PyPI package. For now, make a `pywbem3` folder in your site-packages folder and put the contents of this repo inside it.
 
 Documentation
 -------------
@@ -49,19 +49,20 @@ Examples
 The following is copied from the official examples (see documentation) for convenience:
 
 ```python
-import pywbem
+import pywbem3
 
 # Make connection
-conn = pywbem.WBEMConnection('https://server',     # url
-                             ('root', 'penguin'))  # credentials
+conn = pywbem3.WBEMConnection('https://server',     # url
+                              ('root', 'penguin'))
+# credentials
 
 # Enumerate CIM_Process instance names and instances
 
 instance_names = conn.EnumerateInstanceNames('CIM_Process')
 instances = conn.EnumerateInstance('CIM_Process')
 
-print '%d CIM_Process names returned' % len(instance_names)
-print '%d CIM_Process instances returned' % len(instance_names)
+print('{count} CIM_Process names returned'.format(count=len(instance_names)))
+print('{count} CIM_Process instances returned'.format(count=len(instance_names)))
 
 # Get all CIM_OperatingSystem instances
 
@@ -71,6 +72,6 @@ names = conn.EnumerateInstanceNames('CIM_OperatingSystem')
 
 for n in names:
     os = conn.GetInstance(n)
-    for key, value in os.items():
-        print '%s = %s' % (key, value)
+    for key, value in list(os.items()):
+        print('{key} = {value}'.format(key=key, value=value))
 ```
